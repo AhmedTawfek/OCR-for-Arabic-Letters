@@ -4,8 +4,23 @@ import os
 import numpy as np
 
 dataset_path = '/Users/hejazi/Downloads/DBAHCL/Trial/Training' # the dataset file or root folder path.
-batch_size = 128
 max_value = tf.placeholder(tf.int64, shape=[])
+# Training Parameters
+learning_rate = 0.001
+num_steps = 500
+batch_size = 128
+test_size = 100
+display_step = 10
+
+# Network Parameters
+num_input = 2352 # MNIST data input (img shape: 28*28)
+num_classes = 10 # MNIST total classes (0-9 digits)
+dropout = 0.75 # Dropout, probability to keep units
+
+# tf Graph input
+X = tf.placeholder(tf.float32, [None, num_input])
+Y = tf.placeholder(tf.float32, [None, num_classes])
+keep_prob = tf.placeholder(tf.float32) # dropout (keep probability)
 
 def read_images(dataset_path):
     imagepaths, labels = list(), list()
@@ -56,22 +71,6 @@ dataset = dataset.batch(batch_size)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
-# Training Parameters
-learning_rate = 0.001
-num_steps = 500
-batch_size = 128
-test_size = 100
-display_step = 10
-
-# Network Parameters
-num_input = 2352 # MNIST data input (img shape: 28*28)
-num_classes = 10 # MNIST total classes (0-9 digits)
-dropout = 0.75 # Dropout, probability to keep units
-
-# tf Graph input
-X = tf.placeholder(tf.float32, [None, num_input])
-Y = tf.placeholder(tf.float32, [None, num_classes])
-keep_prob = tf.placeholder(tf.float32) # dropout (keep probability)
 
 # Create some wrappers for simplicity
 def conv2d(x, W, b, strides=1):
