@@ -3,7 +3,7 @@ import tensorflow as tf
 import os
 import numpy as np
 
-dataset_path = '/Users/hejazi/Downloads/DBAHCL/Trial/Training' # the dataset file or root folder path.
+dataset_path = '/Users/ahmedtawfik/PycharmProjects/OCR-for-Arabic-Letters/DBAHCL/Trial/Training'  # the dataset file or root folder path.
 max_value = tf.placeholder(tf.int64, shape=[])
 # Training Parameters
 learning_rate = 0.001
@@ -26,21 +26,13 @@ def read_images(dataset_path):
     imagepaths, labels = list(), list()
     # An ID will be affected to each sub-folders by alphabetical order
     label = 0
-    # List the directory
-    try:  # Python 2
-        classes = sorted(os.walk(dataset_path).next()[1])
-    except Exception:  # Python 3
-        classes = sorted(os.walk(dataset_path).__next__()[1])
+    classes = sorted(os.walk(dataset_path).__next__()[1])
     # List each sub-directory (the classes)
     for c in classes:
         c_dir = os.path.join(dataset_path, c)
-        try:  # Python 2
-            walk = os.walk(c_dir).next()
-        except Exception:  # Python 3
-            walk = os.walk(c_dir).__next__()
+        walk = os.walk(c_dir).__next__()
         # Add each image to the training set
         for sample in walk[2]:
-            # Only keeps jpeg images
             if sample.endswith('.jpg') or sample.endswith('.jpeg'):
                 imagepaths.append(os.path.join(c_dir, sample))
                 labels.append(label)
@@ -72,7 +64,6 @@ iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
 
-# Create some wrappers for simplicity
 def conv2d(x, W, b, strides=1):
     # Conv2D wrapper, with bias and relu activation
     x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME')
@@ -85,7 +76,6 @@ def maxpool2d(x, k=2):
                           padding='SAME')
 
 def conv_net(x, weights, biases, dropout):
-    # MNIST data input is a 1-D vector of 784 features (28*28 pixels)
     # Reshape to match picture format [Height x Width x Channel]
     # Tensor input become 4-D: [Batch Size, Height, Width, Channel]
     x = tf.reshape(x, shape=[-1, 28, 28, 3])
@@ -161,7 +151,7 @@ with tf.Session() as sess:
 
     print("Optimization Finished!")
 
-    test_path = '/Users/hejazi/Downloads/DBAHCL/Trial/Testing'
+    test_path = '/Users/ahmedtawfik/PycharmProjects/OCR-for-Arabic-Letters/DBAHCL/Trial/Testing'
     filenames, labels = read_images(test_path)
     testset = tf.data.Dataset.from_tensor_slices((filenames, labels))
     testset = testset.map(_parse_function)

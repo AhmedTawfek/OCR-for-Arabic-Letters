@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 import os
 
-dataset_path = '/Users/hejazi/Downloads/DBAHCL/Trial/Training'  # the dataset file or root folder path.
 
 # tf Graph Input
 max_value = tf.placeholder(tf.int64, shape=[])
@@ -12,7 +11,7 @@ num_input = 2352
 xtr = tf.placeholder("float", [None, num_input])
 xte = tf.placeholder("float", [num_input])
 
-dataset_path = '/Users/hejazi/Downloads/DBAHCL/Trial/Training'  # the dataset file or root folder path.
+dataset_path = '/Users/ahmedtawfik/PycharmProjects/OCR-for-Arabic-Letters/DBAHCL/Trial/Training'  # the dataset file
 batch_size = 900
 fold_size = batch_size//10
 test_size = 50
@@ -22,21 +21,13 @@ def read_images(dataset_path):
     imagepaths, labels = list(), list()
     # An ID will be affected to each sub-folders by alphabetical order
     label = 0
-    # List the directory
-    try:  # Python 2
-        classes = sorted(os.walk(dataset_path).next()[1])
-    except Exception:  # Python 3
-        classes = sorted(os.walk(dataset_path).__next__()[1])
+    classes = sorted(os.walk(dataset_path).__next__()[1])
     # List each sub-directory (the classes)
     for c in classes:
         c_dir = os.path.join(dataset_path, c)
-        try:  # Python 2
-            walk = os.walk(c_dir).next()
-        except Exception:  # Python 3
-            walk = os.walk(c_dir).__next__()
+        walk = os.walk(c_dir).__next__()
         # Add each image to the training set
         for sample in walk[2]:
-            # Only keeps jpeg images
             if sample.endswith('.jpg') or sample.endswith('.jpeg'):
                 imagepaths.append(os.path.join(c_dir, sample))
                 labels.append(label)
@@ -88,15 +79,10 @@ with tf.Session() as sess:
         Yte = Y[j * fold_size:j * fold_size + fold_size]
         Xtr = np.append(X[:j * fold_size], X[j * fold_size + fold_size:], axis=0)
         Ytr = np.append(Y[:j * fold_size], Y[j * fold_size + fold_size:], axis=0)
-        #print(Ytr.shape)
         for i in range(len(Xte)):
             # Get nearest neighbor
             nn_index = sess.run(pred, feed_dict={xtr: Xtr, xte: Xte[i, :]})
-            # Get nearest neighbor class label and compare it to its true label
-            print
-            "Test", i, "Prediction:", np.argmax(Ytr[nn_index]), \
-            "True Class:", np.argmax(Yte[i])
-            # Calculate accuracy
+            print("Test", i, "Prediction:", np.argmax(Ytr[nn_index]), "True Class:", np.argmax(Yte[i]))
             ConfusionMatrix[np.argmax(Yte[i])][np.argmax(Ytr[nn_index])] += 1
             if np.argmax(Ytr[nn_index]) == np.argmax(Yte[i]):
                 accuracy += 1. / batch_size
